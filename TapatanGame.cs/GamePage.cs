@@ -22,17 +22,17 @@ namespace TapatanGame.cs
         private Dictionary<string, int> playerWins = new Dictionary<string, int>();
         private Dictionary<string, int> playerGames = new Dictionary<string, int>();
 
-        bool player1, won;
-        bool player2;
-        int p1MoveCount;
-        int p2MoveCount;
-        PictureBox pxt;
-        string text1;
-        string text2;
-        private Stopwatch stopwatch;
+        private bool player1, won;
+        private bool player2;
+        private int p1MoveCount;
+        private int p2MoveCount;
+        private PictureBox pxt = new PictureBox();
+        private string text1;
+        private string text2;
+        private Stopwatch stopwatch = new Stopwatch();
         private System.Windows.Forms.Timer CountDown;
-        private Label lblTime;
-        public SoundPlayer player = new SoundPlayer();
+        private Label lblTime = new Label();
+        private SoundPlayer player = new SoundPlayer();
 
 
         //---------------------------
@@ -41,7 +41,7 @@ namespace TapatanGame.cs
             InitializeComponent();
             PlayMusic();
             pnlbckonlopt.SendToBack();
-            
+
             lblp1turn.Visible = false;
             player1 = true;
             p1MoveCount = 0;
@@ -69,7 +69,7 @@ namespace TapatanGame.cs
             exitpnl.Hide();
         }
 
-        #region LEADERBOARD FUNCTIONS
+        #region Game Leaderboard Functions
         private void UpdateLeaderboard()
         {
             var sortedPlayers = playerWins.OrderByDescending(x => (double)x.Value / playerGames[x.Key])
@@ -77,12 +77,28 @@ namespace TapatanGame.cs
                                            .ToList();
 
             leaderboardListBox.Items.Clear();
-        
+
             foreach (var player in sortedPlayers)
             {
-                double winrate = playerGames[player] == 0 ? 0 : (double)playerWins[player] / playerGames[player];
-                leaderboardListBox.Items.Add($"{player}: Winrate - {winrate:P}");
+                double winrate;
+                if (playerGames[player] == 0)
+                {
+                    // If no games have been played, win rate is 0%
+                    winrate = 0.0;
+                }
+                else
+                {
+                    // Calculate win rate
+                    winrate = (double)playerWins[player] / playerGames[player] * 100;
+                }
+
+                // Format win rate to two decimal places
+                string formattedWinrate = winrate.ToString("F2");
+
+                leaderboardListBox.Items.Add($"{player}: Winrate - {formattedWinrate}%");
+                
             }
+
         }
 
         private void UpdatePlayerStats(string player, bool hasWon)
@@ -104,21 +120,34 @@ namespace TapatanGame.cs
         private void GameEnded(string winner)
         {
             UpdatePlayerStats(winner, true);
-            string loser = winner == "Player 1" ? "Player 2" : "Player 1";
+            string loser = (winner == "Player 1") ? "Player 2" : "Player 1";
             UpdatePlayerStats(loser, false);
+
+            
         }
         #endregion
+
+        #region Game Music
         private void PlayMusic()
         {
-            //player.SoundLocation = "C:\\Users\\DARYL\\Desktop\\TapatanNiEmman _5_11_24\\TPTN_UI\\5_12_24\\TapatanGame.cs\\bin\\Debug\\bgmusic\\bg1.wav";
-            //player.PlayLooping();
+            try
+            {
+                player.SoundLocation = @"C:\path\to\your\bgmusic\bg1.wav";
+                player.PlayLooping();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error playing music: " + ex.Message);
+            }
 
         }
-        #region Cellsbtns
+        #endregion
+
+        #region Game Cells
         private void cells(object sender, EventArgs e)
         {
             pxt = sender as PictureBox;
-           
+
 
             if (p1MoveCount < 3 || p2MoveCount < 3)
             {
@@ -171,7 +200,7 @@ namespace TapatanGame.cs
         }
         #endregion
 
-        #region CheckForWinner
+        #region Game Check Winner
         private void CheckForWinner()
         {
             string winner = "";
@@ -245,20 +274,9 @@ namespace TapatanGame.cs
             }
             GameEnded(winner);
         }
-
-
-
-
-
-
         #endregion
 
-
-
-
-
-
-        #region OptionsFunc
+        #region Game Events
         private void Homepg(object sender, EventArgs e)
         {
             Form1 homepg = new Form1();
@@ -318,12 +336,7 @@ namespace TapatanGame.cs
 
         #endregion
 
-
-
-
-
-
-
+        #region Game Restart
         void gameRestart()
         {
             // Reset game state variables
@@ -334,7 +347,7 @@ namespace TapatanGame.cs
             text1 = ".";
             text2 = ".";
             stopwatch.Stop();
-            pnlsettings.SendToBack();     
+            pnlsettings.SendToBack();
             won = false;
             stopwatch.Reset();
             lblTime.Text = stopwatch.Elapsed.ToString(@"mm\:ss\.fff");
@@ -344,7 +357,7 @@ namespace TapatanGame.cs
             {
                 if (control is PictureBox pictureBox)
                 {
-                    if(pictureBox.Name == "pbboardaxis")
+                    if (pictureBox.Name == "pbboardaxis")
                     {
 
                     }
@@ -353,13 +366,15 @@ namespace TapatanGame.cs
                         pictureBox.Image = null;
                         pictureBox.Text = "";
                     }
-                      
+
                 }
             }
             GameTimer.Start();
-            
-        }
 
+        }
+        #endregion
+
+        #region Game Timer
         private void GameTimer_Tick(object sender, EventArgs e)
         {
             CheckForWinner();
@@ -371,14 +386,9 @@ namespace TapatanGame.cs
 
                 stopwatch.Reset();
                 won = false;
-                lblTime.Text = stopwatch.Elapsed.ToString(@"mm\:ss\.fff");              
+                lblTime.Text = stopwatch.Elapsed.ToString(@"mm\:ss\.fff");
                 gameRestart();
             }
-        }
-
-        private void lead1st_Click(object sender, EventArgs e)
-        {
-
         }
         private void CountDownTimer_Tick(object sender, EventArgs e)
         {
@@ -390,10 +400,11 @@ namespace TapatanGame.cs
                 CountDown.Stop();
                 MessageBox.Show("Time's Up!");
 
-                
+
             }
         }
-      
+        #endregion
+
 
     }
 }

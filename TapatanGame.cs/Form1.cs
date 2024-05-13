@@ -61,9 +61,16 @@ namespace TapatanGame.cs
 
         private void PlayMusic()
         {
-            player.SoundLocation = "C:\\Users\\DARYL\\Desktop\\TapatanNiEmman _5_11_24\\TPTN_UI\\5_12_24\\TapatanGame.cs\\bin\\Debug\\bgmusic\\bg1.wav";
-            player.PlayLooping();
-            
+            try
+            {
+                player.SoundLocation = @"C:\path\to\your\bgmusic\bg1.wav";
+                player.PlayLooping();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error playing music: " + ex.Message);
+            }
+
         }
 
         private void musicoff(object sender, EventArgs e)

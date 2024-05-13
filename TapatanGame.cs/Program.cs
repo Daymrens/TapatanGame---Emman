@@ -16,7 +16,7 @@ namespace TapatanGame.cs
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GamePage());
+            Application.Run(new Form1());
         }
     }
 }
